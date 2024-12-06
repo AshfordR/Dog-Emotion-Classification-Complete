@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJ6H7I5yQ5zvBS6M27G4BAcZdfx1q0vSSxlZplU2pg58XJlTr0+LWhqZZHZr" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 100px auto;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        .dropdown, .upload-section, .train-section, .analytics-section {
+            text-align: center;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
+        .form-control {
+            width: 70%;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 10px 20px;
+            font-size: 16px;
+            width: 100%;
+            border-radius: 5px;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        .table-container {
+            margin-top: 30px;
+            display: none;
+        }
+        .table thead {
+            background-color: #f1f1f1;
+        }
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .left-column, .right-column {
+            width: 48%;
+        }
+        .metrics-table {
+            width: 100%;
+        }
+        .metrics-table th, .metrics-table td {
+            text-align: center;
+        }
+        .button-spacing {
+        margin-bottom: 10px; /* Adjust as needed */
+    }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 class="text-center mb-4">Admin Dashboard</h2>
+        
+        <!-- Dropdown for selecting class -->
+        <div class="dropdown">
+            <label for="classSelect">Select Class:</label>
+            <select class="form-control" id="classSelect">
+                <option value="Happy">Happy</option>
+                <option value="Pain">Pain</option>
+                <option value="Howling">Howling</option>
+                <option value="Aggressive">Aggressive</option>
+                <option value="Unknown">Unknown</option>
+            </select>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section" id="uploadSection" style="display:none;">
+            <label for="audioUpload">Upload Audio (.wav format):</label>
+            <input type="file" class="form-control" id="audioUpload" accept=".wav">
+            <button class="btn btn-primary mt-3 button-spacing" id="uploadBtn">Upload</button>
+        </div>
+
+        <!-- Train Button -->
+        <div class="train-section mt-4">
+            <button class="btn btn-primary button-spacing" id="trainBtn">Train Model</button>
+        </div>
+
+        <!-- View Analytics Button -->
+        <div class="analytics-section mt-4">
+            <button class="btn btn-primary button-spacing" id="viewAnalyticsBtn">View Analytics</button>
+        </div>
+
+        <!-- Table Section for Analytics -->
+        <div class="table-container" id="tableContainer">
+            <div class="row">
+                <!-- Left Column for Folder Structure -->
+                <div class="left-column">
+                    <h4 class="text-center">Class Distribution</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Number of Files</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analyticsTableBody">
+                            <!-- Dynamic rows will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Right Column for Performance Metrics -->
+                <div class="right-column">
+                    <h4 class="text-center">Performance Metrics</h4>
+                    <table class="table table-bordered metrics-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="metricsTableBody">
+                            <!-- Performance metrics will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gyb3vsYOc5z0h6dTzoC2+zF1a9eIZv6Q0WQXrEke8fJh5WIg3Jf" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0VwK5nD8pF+0yK1vnVFTN5McXfZI9Z5YhbwBOIi/7pX7m5x7" crossorigin="anonymous"></script>
+
+    <script>
+        // Show the upload section when a class is selected
+        document.getElementById('classSelect').addEventListener('change', function() {
+            document.getElementById('uploadSection').style.display = 'block';
+        });
+
+        // Handle file upload
+        document.getElementById('uploadBtn').addEventListener('click', function() {
+            var className = document.getElementById('classSelect').value;
+            var audioFile = document.getElementById('audioUpload').files[0];
+            
+            if (audioFile && audioFile.name.endsWith('.wav')) {
+                var formData = new FormData();
+                formData.append('audio', audioFile);
+                formData.append('class', className);
+                
+                fetch('/upload_audio', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Audio uploaded successfully!');
+                    } else {
+                        alert('Error uploading audio: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('Error uploading audio: ' + error);
+                });
+            } else {
+                alert('Please select a valid .wav file.');
+            }
+        });
+
+        // Handle Train Button Click
+        document.getElementById('trainBtn').addEventListener('click', function() {
+            fetch('/train_model', {
+                method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Model training started!');
+                } else {
+                    alert('Error training model: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error training model: ' + error);
+            });
+        });
+
+        // Handle View Analytics Button Click
+        document.getElementById('viewAnalyticsBtn').addEventListener('click', function() {
+            fetch('/get_folder_structure', {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    renderTable(data.structure);
+                    // Fetch performance metrics here
+                    fetch('/get_performance_metrics')
+                    .then(response => response.json())
+                    .then(metrics => {
+                        renderMetrics(metrics.metrics);
+                    })
+                    .catch(error => {
+                        alert('Error retrieving performance metrics: ' + error);
+                    });
+                } else {
+                    alert('Error retrieving analytics: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error retrieving analytics: ' + error);
+            });
+        });
+
+        // Render Folder Structure Table
+        function renderTable(structure) {
+            const tableBody = document.getElementById('analyticsTableBody');
+            tableBody.innerHTML = ''; // Clear previous table data
+
+            for (const className in structure) {
+                const row = document.createElement('tr');
+                const classCell = document.createElement('td');
+                const fileCountCell = document.createElement('td');
+
+                classCell.textContent = className;
+                fileCountCell.textContent = structure[className];
+
+                row.appendChild(classCell);
+                row.appendChild(fileCountCell);
+                tableBody.appendChild(row);
+            }
+
+            // Show the table container
+            document.getElementById('tableContainer').style.display = 'block';
+        }
+
+        // Render Performance Metrics Table
+        // Render Performance Metrics Table with full precision
+function renderMetrics(metrics) {
+    const tableBody = document.getElementById('metricsTableBody');
+    tableBody.innerHTML = ''; // Clear previous metrics
+
+    for (const metric in metrics) {
+        const row = document.createElement('tr');
+        const metricCell = document.createElement('td');
+        const valueCell = document.createElement('td');
+
+        metricCell.textContent = metric;
+        // Format the value to show up to 2 decimal places
+        valueCell.textContent = metrics[metric].toFixed(2);
+
+        row.appendChild(metricCell);
+        row.appendChild(valueCell);
+        tableBody.appendChild(row);
+    }
+}
+
+    </script>
+
+</body>
+</html>
