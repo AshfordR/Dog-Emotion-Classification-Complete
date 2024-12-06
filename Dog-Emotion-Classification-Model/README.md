@@ -29,7 +29,7 @@
 4. Run the Flask App
 - Start the Flask app:
 ``` bash
-    flask run
+    flask run --host=0.0.0.0
 ```
 This will run the app on http://198.X.X.X:5000. You should see output similar to:
  * Running on http://198.X.X.X:5000
