@@ -29,3 +29,9 @@ This project is a Dog Emotion Recognition system that uses machine learning to c
    ```bash
    git clone <repository-url>
    cd <project-folder>
+
+### 2. Create and Activate Virtual Environment
+
+Create a virtual environment:
+```bash
+python -m venv .venv
