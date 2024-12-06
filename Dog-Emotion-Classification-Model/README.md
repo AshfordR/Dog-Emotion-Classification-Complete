@@ -8,7 +8,7 @@
 ``` bash 
    git clone https://github.com/AshfordR/Dog-Emotion-Classification-Complete.git
 
-   cd Dog-Emotion-Classificayion-Model
+   cd Dog-Emotion-Classification-Model
 ```
 2. Create and Activate Virtual Environment
 - Create a virtual environment:
