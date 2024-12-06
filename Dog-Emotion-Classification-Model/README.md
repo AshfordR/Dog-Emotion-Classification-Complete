@@ -13,7 +13,7 @@
 2. Create and Activate Virtual Environment
 - Create a virtual environment:
 ```bash
-    python-m venv .venv
+    python -m venv .venv
 ```
 - Activate the virtual environment:
 ``` bash
@@ -24,7 +24,7 @@
 3. Install Dependencies
 - Install the necessary Python packages from `requirements.txt`:
 ``` bash 
-    pip install-r requirements.txt
+    pip install -r requirements.txt
 ```
 4. Run the Flask App
 - Start the Flask app:
